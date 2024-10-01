@@ -1,63 +1,90 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ICategory } from 'src/shared';
-import { Model } from 'mongoose';
-import AppError from 'src/utils/app-error';
+import { Model, Types } from 'mongoose';
+import AppError from 'src/utils/app-error.utils';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dtos';
+import { sanitizeInput } from 'src/utils/sanitize.utils';
+import { BaseRepository } from 'src/database';
 
 @Injectable()
-export class CategoryService {
+export class CategoryService extends BaseRepository<ICategory> {
   constructor(
-    @InjectModel('categories') 
+    @InjectModel('categories')
     private readonly categoryModel: Model<ICategory>,
-  ) {}
+  ) {
+    super(categoryModel);
+  }
 
   async createCategory(
     createCategoryDto: CreateCategoryDto,
   ): Promise<Partial<ICategory>> {
-    const { name, description } = createCategoryDto;
+    const sanitizedData = sanitizeInput(createCategoryDto);
+    const { name, description } = sanitizedData;
+
     const nameExists = await this.getCategoriesByName(name);
     if (nameExists) {
       throw new AppError('Category already exists', HttpStatus.CONFLICT);
     }
+
     const category = await this.categoryModel.create({ name, description });
     return category.toPayload();
   }
 
   async getAllCategories(): Promise<Partial<ICategory>[]> {
     const categories = await this.categoryModel.find().exec();
-    return categories.map(category => category.toPayload());
+    return categories.map((category) => category.toPayload());
   }
 
-  async getCategoriesByName(name: string): Promise<ICategory> {
-    return this.categoryModel.findOne({ name });
+  async getCategoriesByName(name: string): Promise<ICategory | null> {
+    const sanitizedName = sanitizeInput(name);
+    return this.categoryModel.findOne({ name: sanitizedName }).exec();
   }
 
   async getCategoriesById(id: string): Promise<Partial<ICategory>> {
-    const category = await this.categoryModel.findById(id);
-    
+    const sanitizedId = sanitizeInput(id);
+    if (!Types.ObjectId.isValid(sanitizedId)) {
+      throw new AppError('Invalid category ID', HttpStatus.BAD_REQUEST);
+    }
+
+    const category = await this.categoryModel.findById(sanitizedId).exec();
     if (!category) {
       throw new AppError('Category not found', HttpStatus.NOT_FOUND);
     }
-    
+
     return category.toPayload();
   }
 
   async updateCategory(
-    categoryId: string, 
+    categoryId: string,
     updateData: UpdateCategoryDto,
-  ): Promise<Partial<ICategory>> {
-    const category = await this.categoryModel.findByIdAndUpdate(
-      categoryId, 
-      updateData, 
-      { new: true },
-    );
-    return category ? category.toPayload() : null;
+  ): Promise<Partial<ICategory> | null> {
+    const sanitizedId = sanitizeInput(categoryId);
+    if (!Types.ObjectId.isValid(sanitizedId)) {
+      throw new AppError('Invalid category ID', HttpStatus.BAD_REQUEST);
+    }
+
+    const sanitizedUpdateData = sanitizeInput(updateData);
+    const category = await this.categoryModel
+      .findByIdAndUpdate(sanitizedId, sanitizedUpdateData, { new: true })
+      .exec();
+
+    if (!category) {
+      throw new AppError('Category not found', HttpStatus.NOT_FOUND);
+    }
+
+    return category.toPayload();
   }
 
   async deleteCategory(id: string): Promise<void> {
-    const category = await this.categoryModel.findByIdAndDelete(id);
-    
+    const sanitizedId = sanitizeInput(id);
+    if (!Types.ObjectId.isValid(sanitizedId)) {
+      throw new AppError('Invalid category ID', HttpStatus.BAD_REQUEST);
+    }
+
+    const category = await this.categoryModel
+      .findByIdAndDelete(sanitizedId)
+      .exec();
     if (!category) {
       throw new AppError('Category not found', HttpStatus.NOT_FOUND);
     }

@@ -5,7 +5,7 @@ import * as argon from 'argon2';
 import { accessToken, JwtPayload, refreshToken } from 'src/shared';
 import configuration from 'src/config/configuration';
 import { UserService } from 'src/modules';
-import AppError from 'src/utils/app-error';
+import AppError from 'src/utils/app-error.utils';
 import { User } from 'src/schema';
 
 const config = configuration();
@@ -16,8 +16,7 @@ export class AuthService {
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-  ) {
-  }
+  ) {}
 
   async generateAccessToken(
     userId: string,
@@ -89,12 +88,11 @@ export class AuthService {
       throw new AppError('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
 
-
     const [accessTokenDetails, refreshTokenDetails] = await Promise.all([
       this.generateAccessToken(user.id, user.email),
       this.generateRefreshTokens(user.id, user.email),
     ]);
-    
+
     const tokens: accessToken | refreshToken = {
       ...accessTokenDetails,
       ...refreshTokenDetails,

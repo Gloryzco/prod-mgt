@@ -35,6 +35,7 @@
     "express-rate-limit": "^7.4.0",
     "helmet": "^8.0.0",
     "ioredis": "^5.4.1",
+    "mongo-sanitize": "^1.1.0",
     "mongoose": "^8.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.1.13",

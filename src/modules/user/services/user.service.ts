@@ -4,7 +4,7 @@ import { CreateUserDto } from '../dtos';
 import { InjectModel } from '@nestjs/mongoose';
 import { IUser } from 'src/shared';
 import { Model } from 'mongoose';
-import AppError from 'src/utils/app-error';
+import AppError from 'src/utils/app-error.utils';
 
 @Injectable()
 export class UserService {

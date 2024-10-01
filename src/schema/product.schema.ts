@@ -1,7 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 import { model, Schema } from 'mongoose';
 import { IProduct } from 'src/shared';
-import AppError from 'src/utils/app-error';
+import AppError from 'src/utils/app-error.utils';
 import { Category } from './category.schema';
 
 const productSchema: Schema<IProduct> = new Schema(

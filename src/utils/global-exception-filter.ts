@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ResponseFormat } from './response-format';
-import AppError from './app-error';
+import AppError from './app-error.utils';
 import AppValidationError from './app-validation-error';
 
 export interface ErrorLogDetails {
@@ -38,7 +38,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       return HttpStatus.BAD_REQUEST;
     }
 
-    if (exception.name === 'JsonWebTokenError' || exception.name === 'TokenExpiredError') {
+    if (
+      exception.name === 'JsonWebTokenError' ||
+      exception.name === 'TokenExpiredError'
+    ) {
       return HttpStatus.UNAUTHORIZED;
     }
 
