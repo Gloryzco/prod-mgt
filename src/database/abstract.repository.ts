@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { HttpStatus, NotFoundException } from '@nestjs/common';
 import {
   FilterQuery,
   Model,
@@ -29,7 +29,7 @@ export abstract class AbstractRepository<TDocument extends Document> {
       const existingDocument = await this.model.findOne({ email }).exec();
       if (existingDocument) {
         this.logger.warn('Document with this email already exists', { email });
-        throw new AppError('0002', 'Email already in use.');
+        throw new AppError('Email already in use.', HttpStatus.CONFLICT);
       }
     }
 
@@ -91,7 +91,7 @@ export abstract class AbstractRepository<TDocument extends Document> {
       return deletedDocument as TDocument;
     } catch (error) {
       this.logger.error('Error deleting document', error.message);
-      throw new AppError('0002', 'Error deleting document');
+      throw new AppError('Error deleting document', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 

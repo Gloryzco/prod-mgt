@@ -1,5 +1,5 @@
 import { Document, Schema, model } from 'mongoose';
-import { ICategory, IUSer } from 'src/shared';
+import { ICategory, IUser } from 'src/shared';
 
 const categorySchema: Schema<ICategory> = new Schema(
   {

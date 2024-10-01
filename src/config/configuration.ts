@@ -21,4 +21,11 @@ export default () => ({
   mongodb: {
     url: config.get<string>('MONGODB_URL'),
   },
+
+  jwt: {
+    access_tokenSecret: config.get<string>('ACCESS_TOKEN_SECRET'),
+    refresh_tokenSecret: config.get<string>('REFRESH_TOKEN_SECRET'),
+    access_tokenExpiration: config.get<string>('ACCESS_TOKEN_EXPIRATION'),
+    refresh_tokenExpiration: config.get<string>('REFRESH_TOKEN_EXPIRATION'),
+  },
 });

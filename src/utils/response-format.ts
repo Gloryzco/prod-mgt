@@ -1,15 +1,13 @@
 import { Response } from 'express';
 import { HttpStatus } from '@nestjs/common';
-import { ResponseCodes } from './response-codes';
-import { ErrorCode } from 'src/shared';
 
 export class ResponseFormat {
   /**
-   * Sends default JSON resonse to client
-   * @param {*} code
-   * @param {*} data
-   * @param {*} message
-   * @param {*} code
+   * Sends a success response to the client.
+   * @param res - Express Response object
+   * @param data - Data to be sent in the response
+   * @param message - Custom message for the response
+   * @param code - HTTP status code (default: 200 OK)
    */
   static successResponse<T>(
     res: Response,
@@ -17,58 +15,29 @@ export class ResponseFormat {
     message: string,
     code: HttpStatus = HttpStatus.OK,
   ) {
-    this.sendResponse(res, ResponseCodes['0000'], data, message, code);
+    this.sendResponse(res, 'success', data, message, code);
   }
 
   /**
-   * Sends default JSON resonse to client
-   * @param {*} code
-   * @param {*} data
-   * @param {*} message
-   * @param {*} code
+   * Sends an OK response to the client.
+   * @param res - Express Response object
+   * @param message - Custom message for the response
+   * @param code - HTTP status code (default: 200 OK)
    */
   static okResponse(
     res: Response,
     message: string,
     code: HttpStatus = HttpStatus.OK,
   ) {
-    const response = {
-      status: 'OK',
-      code: '00',
-      message: message,
-    };
-
-    res.status(code).json(response);
+    this.sendResponse(res, 'success', undefined, message, code);
   }
 
   /**
-   * Sends default JSON resonse to client
-   * @param {*} code
-   * @param {*} data
-   * @param {*} message
-   * @param {*} code
-   */
-  static requeryResponse<T>(
-    res: Response,
-    data: T,
-    message: string,
-    code: HttpStatus = HttpStatus.ACCEPTED,
-  ) {
-    this.sendResponse(
-      res,
-      ResponseCodes[ErrorCode['0001']],
-      data,
-      message,
-      code,
-    );
-  }
-
-  /**
-   * Sends default JSON resonse to client
-   * @param {*} code
-   * @param {*} data
-   * @param {*} message
-   * @param {*} code
+   * Sends a failure response to the client.
+   * @param res - Express Response object
+   * @param data - Data to be sent in the response
+   * @param message - Custom message for the response
+   * @param code - HTTP status code (default: 400 Bad Request)
    */
   static failureResponse<T>(
     res: Response,
@@ -76,35 +45,27 @@ export class ResponseFormat {
     message: string,
     code: HttpStatus = HttpStatus.BAD_REQUEST,
   ) {
-    this.sendResponse(res, ResponseCodes['0002'], data, message, code);
+    this.sendResponse(res, 'error', data, message, code);
   }
 
-  static handleAppErrorResponse(
-    res: Response,
-    errorCode: string,
-    code: HttpStatus = HttpStatus.OK,
-    message?: string,
-  ) {
-    this.sendResponse(
-      res,
-      ResponseCodes[errorCode],
-      undefined,
-      message || undefined,
-      code,
-    );
-  }
-
+  /**
+   * Sends a standardized response to the client.
+   * @param res - Express Response object
+   * @param status - Status of the response ('success' or 'error')
+   * @param data - Data to be sent in the response
+   * @param message - Custom message for the response
+   * @param code - HTTP status code (default: 200 OK)
+   */
   static sendResponse(
     res: Response,
-    resDataType,
-    data,
+    status: 'success' | 'error',
+    data: any,
     message: string,
     code: HttpStatus = HttpStatus.OK,
   ) {
     const response = {
-      status: resDataType?.status ?? 'FAILED',
-      code: resDataType?.code ?? '06',
-      message: message ?? resDataType?.message,
+      status,
+      message,
       data: data ?? undefined,
     };
 
