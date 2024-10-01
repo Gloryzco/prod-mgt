@@ -23,9 +23,9 @@ export default () => ({
   },
 
   jwt: {
-    access_tokenSecret: config.get<string>('ACCESS_TOKEN_SECRET'),
-    refresh_tokenSecret: config.get<string>('REFRESH_TOKEN_SECRET'),
-    access_tokenExpiration: config.get<string>('ACCESS_TOKEN_EXPIRATION'),
-    refresh_tokenExpiration: config.get<string>('REFRESH_TOKEN_EXPIRATION'),
+    accessTokenSecret: config.get<string>('accessTokenSecret'),
+    refreshTokenSecret: config.get<string>('refreshTokenSecret'),
+    accessTokenExpiration: config.get<string>('accessTokenExpiration'),
+    refreshTokenExpiration: config.get<string>('refreshTokenExpiration'),
   },
 });

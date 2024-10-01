@@ -1,9 +1,8 @@
 import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
 
 export class CreateUserDto {
-  @IsNotEmpty({ message: 'Emiil is required.' })
-  @IsString()
   @IsEmail()
+  @IsNotEmpty({ message: 'Email is required.' })
   readonly email: string;
 
   @IsNotEmpty({ message: 'Password is required' })

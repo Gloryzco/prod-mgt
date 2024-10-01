@@ -5,7 +5,7 @@ import { UserService } from 'src/modules';
 import AppError from 'src/utils/app-error';
 
 @Injectable()
-export class access_tokenGuard extends AuthGuard('jwt') {
+export class accessTokenGuard extends AuthGuard('jwt') {
   constructor(
     private userService: UserService,
     private reflector: Reflector,

@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import * as argon from 'argon2';
 import { CreateUserDto } from '../dtos';
 import { InjectModel } from '@nestjs/mongoose';
 import { IUser } from 'src/shared';
 import { Model } from 'mongoose';
+import AppError from 'src/utils/app-error';
 
 @Injectable()
 export class UserService {
@@ -16,11 +17,11 @@ export class UserService {
     const { email, password } = createUserDto;
     const userExists = await this.findByEmail(email);
     if (userExists) {
-      throw new Error('User with this email exists');
+      throw new AppError('User with this email exists', HttpStatus.CONFLICT);
     }
     const hashPassword = await argon.hash(password);
     const user = await this.userModel.create({ email, password: hashPassword });
-    return user;
+    return user.toPayload();
   }
 
   async findByEmail(email: string): Promise<IUser> {

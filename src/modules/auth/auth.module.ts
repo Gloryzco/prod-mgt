@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './controllers';
 import { AuthService } from './services';
-import { UserModule } from '../user';
+import { UserModule, UserService } from '../user';
 import { AccessTokenStrategy, RefreshTokenStrategy } from 'src/shared';
 
 @Module({

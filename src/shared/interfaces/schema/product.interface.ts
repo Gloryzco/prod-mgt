@@ -4,7 +4,7 @@ export interface IProduct extends Document{
     readonly name: string;
     readonly description: string;
     readonly price: number;
-    readonly stock_quantity: number;
-    readonly category: Schema.Types.ObjectId;
+    readonly stockQuantity: number;
+    readonly categoryId: Schema.Types.ObjectId;
     
 }

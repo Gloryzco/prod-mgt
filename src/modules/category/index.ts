@@ -1,4 +1,4 @@
-export * from './product.module';
-export * from './dtos';
+export * from './category.module';
 export * from './controllers';
 export * from './services';
+export * from './dtos';

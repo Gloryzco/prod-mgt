@@ -9,7 +9,7 @@ import { Schema } from 'mongoose';
   imports: [
     MongooseModule.forFeature([
       {
-        name: 'User',
+        name: 'users',
         schema: userSchema,
       },
     ]),

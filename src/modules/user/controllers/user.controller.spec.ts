@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { CreateUserDto } from '../dtos';
 import { UserService } from '../services';
-import { ResponseFormat } from 'src/shared';
+import { ResponseFormat } from 'src/utils';
 
 describe('UserController', () => {
   let userController: UserController;

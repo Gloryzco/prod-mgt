@@ -1,7 +1,7 @@
 import { Controller, Body, Response, Post, UseGuards } from '@nestjs/common';
 import { LoginDto, RefreshTokenDto } from '../dtos';
 import { AuthService } from '../services';
-import { access_tokenGuard } from 'src/shared/guards';
+import { accessTokenGuard } from 'src/shared/guards';
 import { ResponseFormat } from 'src/utils';
 import { GetCurrentUserId } from 'src/shared';
 
@@ -15,26 +15,26 @@ export class AuthController {
     ResponseFormat.successResponse(res, user_login, 'User logged in');
   }
 
-  @UseGuards(access_tokenGuard)
+  @UseGuards(accessTokenGuard)
   @Post('logout')
   async logout(
     @Response() res,
     @GetCurrentUserId() userId: string,
   ): Promise<any> {
-    const user_logout = await this.authService.logout(userId);
-    ResponseFormat.successResponse(res, user_logout, 'User logged out');
+    const userLogout = await this.authService.logout(userId);
+    ResponseFormat.successResponse(res, userLogout, 'User logged out');
   }
 
-  @UseGuards(access_tokenGuard)
+  @UseGuards(accessTokenGuard)
   @Post('refresh-token')
-  async refresh_token(
+  async refreshToken(
     @Response() res,
-    @Body() refresh_token: RefreshTokenDto,
+    @Body() refreshToken: RefreshTokenDto,
   ): Promise<any> {
-    const access_token = await this.authService.refresh_token(refresh_token);
+    const accessToken = await this.authService.refreshToken(refreshToken);
     ResponseFormat.successResponse(
       res,
-      access_token,
+      accessToken,
       'Token Refreshed Successfully',
     );
   }

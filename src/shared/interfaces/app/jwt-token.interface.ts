@@ -1,9 +1,9 @@
-export interface access_token {
-  access_token: string;
-  access_tokenExpiresIn: string;
+export interface accessToken {
+  accessToken: string;
+  accessTokenExpiresIn: string;
 }
 
-export interface refresh_token {
-  refresh_token: string;
-  refresh_tokenExpiresIn: string;
+export interface refreshToken {
+  refreshToken: string;
+  refreshTokenExpiresIn: string;
 }

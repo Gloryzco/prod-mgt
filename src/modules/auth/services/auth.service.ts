@@ -1,65 +1,68 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto, RefreshTokenDto } from '../dtos';
 import * as argon from 'argon2';
-import { access_token, JwtPayload, refresh_token } from 'src/shared';
+import { accessToken, JwtPayload, refreshToken } from 'src/shared';
 import configuration from 'src/config/configuration';
 import { UserService } from 'src/modules';
 import AppError from 'src/utils/app-error';
+import { User } from 'src/schema';
 
 const config = configuration();
 
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) {
+  }
 
-  async generateaccess_token(
+  async generateAccessToken(
     userId: string,
     email: string,
-  ): Promise<access_token> {
+  ): Promise<accessToken> {
     const jwtPayload: JwtPayload = {
       sub: userId,
       email: email,
     };
 
-    const access_token = await this.jwtService.signAsync(jwtPayload, {
-      secret: config.jwt.access_tokenSecret,
-      expiresIn: config.jwt.access_tokenExpiration,
+    const accessToken = await this.jwtService.signAsync(jwtPayload, {
+      secret: config.jwt.accessTokenSecret,
+      expiresIn: config.jwt.accessTokenExpiration,
     });
 
     return {
-      access_token: access_token,
-      access_tokenExpiresIn: config.jwt.access_tokenExpiration,
+      accessToken: accessToken,
+      accessTokenExpiresIn: config.jwt.accessTokenExpiration,
     };
   }
 
-  async generaterefresh_tokens(
+  async generateRefreshTokens(
     userId: string,
     email: string,
-  ): Promise<refresh_token> {
+  ): Promise<refreshToken> {
     const jwtPayload: JwtPayload = {
       sub: userId,
       email: email,
     };
 
-    const refresh_token = await this.jwtService.signAsync(jwtPayload, {
-      secret: config.jwt.refresh_tokenSecret,
-      expiresIn: config.jwt.refresh_tokenExpiration,
+    const refreshToken = await this.jwtService.signAsync(jwtPayload, {
+      secret: config.jwt.refreshTokenSecret,
+      expiresIn: config.jwt.refreshTokenExpiration,
     });
 
     return {
-      refresh_token: refresh_token,
-      refresh_tokenExpiresIn: config.jwt.refresh_tokenExpiration,
+      refreshToken: refreshToken,
+      refreshTokenExpiresIn: config.jwt.refreshTokenExpiration,
     };
   }
 
-  async refresh_token(payload: RefreshTokenDto) {
+  async refreshToken(payload: RefreshTokenDto) {
     const { sub, email } = await this.jwtService.verifyAsync<JwtPayload>(
-      payload.refresh_token,
-      { secret: config.jwt.refresh_tokenSecret },
+      payload.refreshToken,
+      { secret: config.jwt.refreshTokenSecret },
     );
 
     const user = await this.userService.findById(sub);
@@ -67,18 +70,18 @@ export class AuthService {
     if (!user) {
       throw new AppError('Invalid refresh token', HttpStatus.UNAUTHORIZED);
     }
-    const access_token = await this.generateaccess_token(sub, email);
-    return access_token;
+    const accessToken = await this.generateAccessToken(sub, email);
+    return accessToken;
   }
 
-  async updaterefresh_token(userId: string, refresh_token: string) {
-    const hashedrefresh_token = await argon.hash(refresh_token);
+  async updateRefreshToken(userId: string, refreshToken: string) {
+    const hashed_refreshToken = await argon.hash(refreshToken);
     await this.userService.update(userId, {
-      refresh_token: hashedrefresh_token,
+      refreshToken: hashed_refreshToken,
     });
   }
 
-  async login(loginDto: LoginDto): Promise<access_token | refresh_token> {
+  async login(loginDto: LoginDto): Promise<accessToken | refreshToken> {
     const { email, password } = loginDto;
     const user = await this.userService.findByEmail(email);
 
@@ -86,33 +89,30 @@ export class AuthService {
       throw new AppError('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
 
-    const access_tokenDetails = await this.generateaccess_token(
-      user.id,
-      user.email,
-    );
-    const refresh_tokenDetails = await this.generaterefresh_tokens(
-      user.id,
-      user.email,
-    );
 
-    const tokens: access_token | refresh_token = {
-      ...access_tokenDetails,
-      ...refresh_tokenDetails,
+    const [accessTokenDetails, refreshTokenDetails] = await Promise.all([
+      this.generateAccessToken(user.id, user.email),
+      this.generateRefreshTokens(user.id, user.email),
+    ]);
+    
+    const tokens: accessToken | refreshToken = {
+      ...accessTokenDetails,
+      ...refreshTokenDetails,
     };
-    await this.updaterefresh_token(user.id, refresh_tokenDetails.refresh_token);
+    await this.updateRefreshToken(user.id, refreshTokenDetails.refreshToken);
     return tokens;
   }
 
   async logout(userId: string): Promise<boolean> {
     const user = await this.userService.findById(userId);
-    if (!user || !user.refresh_token) {
+    if (!user || !user.refreshToken) {
       throw new AppError(
         'Access denied. Login required',
         HttpStatus.UNAUTHORIZED,
       );
     }
 
-    await this.userService.update(userId, { refresh_token: null });
+    await this.userService.update(userId, { refreshToken: null });
 
     return true;
   }

@@ -4,15 +4,23 @@ import { ICategory, IUser } from 'src/shared';
 const categorySchema: Schema<ICategory> = new Schema(
   {
     name: { type: String, required: true, unique: true },
+    description: { type: String },
   },
   {
     collection: 'categories',
-    timestamps: {
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
-    },
+    timestamps: true,
   },
 );
+categorySchema.index({ name: 1 });
+
+categorySchema.methods.toPayload = function (): Partial<ICategory> {
+  return {
+    id: this._id,
+    name: this.name,
+    description: this.description,
+    createdAt: this.createdAt,
+  };
+};
 
 const Category = model('Category', categorySchema);
 
