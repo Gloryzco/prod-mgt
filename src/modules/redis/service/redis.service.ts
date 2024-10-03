@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { RedisClientProvider } from '../repository';
 import { LoggerService } from 'src/logger';
+import { IRedisService } from 'src/shared';
 
 const tenMinutesInSeconds = 60 * 10;
 
 @Injectable()
-export class RedisService {
+export class RedisService implements IRedisService{
   constructor(
     private readonly redisClient: RedisClientProvider,
     private readonly loggerService: LoggerService,

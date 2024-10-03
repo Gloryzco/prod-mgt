@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ICategory } from 'src/shared';
+import { ICategory, ICategoryService, PaginationDto } from 'src/shared';
 import { Model, Types } from 'mongoose';
 import AppError from 'src/utils/app-error.utils';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dtos';
@@ -8,7 +8,7 @@ import { sanitizeInput } from 'src/utils/sanitize.utils';
 import { BaseRepository } from 'src/database';
 
 @Injectable()
-export class CategoryService extends BaseRepository<ICategory> {
+export class CategoryService extends BaseRepository<ICategory> implements ICategoryService{
   constructor(
     @InjectModel('categories')
     private readonly categoryModel: Model<ICategory>,
@@ -31,8 +31,16 @@ export class CategoryService extends BaseRepository<ICategory> {
     return category.toPayload();
   }
 
-  async getAllCategories(): Promise<Partial<ICategory>[]> {
-    const categories = await this.categoryModel.find().exec();
+  async getAllCategories(paginationDto: PaginationDto): Promise<Partial<ICategory>[]> {
+    const page = paginationDto?.page ?? 1;
+    const limit = paginationDto?.limit ?? 10;
+  
+    const categories = await this.categoryModel
+      .find()
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
+  
     return categories.map((category) => category.toPayload());
   }
 

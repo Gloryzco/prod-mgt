@@ -2,12 +2,12 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import * as argon from 'argon2';
 import { CreateUserDto } from '../dtos';
 import { InjectModel } from '@nestjs/mongoose';
-import { IUser } from 'src/shared';
+import { IUser, IUserService } from 'src/shared';
 import { Model } from 'mongoose';
 import AppError from 'src/utils/app-error.utils';
 
 @Injectable()
-export class UserService {
+export class UserService implements IUserService {
   constructor(
     @InjectModel('users')
     private readonly userModel: Model<IUser>,

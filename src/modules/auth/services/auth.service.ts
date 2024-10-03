@@ -2,7 +2,7 @@ import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto, RefreshTokenDto } from '../dtos';
 import * as argon from 'argon2';
-import { accessToken, JwtPayload, refreshToken } from 'src/shared';
+import { AccessToken, IAuthService, JwtPayload, RefreshToken } from 'src/shared';
 import configuration from 'src/config/configuration';
 import { UserService } from 'src/modules';
 import AppError from 'src/utils/app-error.utils';
@@ -11,7 +11,7 @@ import { User } from 'src/schema';
 const config = configuration();
 
 @Injectable()
-export class AuthService {
+export class AuthService implements IAuthService{
   constructor(
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
@@ -21,7 +21,7 @@ export class AuthService {
   async generateAccessToken(
     userId: string,
     email: string,
-  ): Promise<accessToken> {
+  ): Promise<AccessToken> {
     const jwtPayload: JwtPayload = {
       sub: userId,
       email: email,
@@ -41,7 +41,7 @@ export class AuthService {
   async generateRefreshTokens(
     userId: string,
     email: string,
-  ): Promise<refreshToken> {
+  ): Promise<RefreshToken> {
     const jwtPayload: JwtPayload = {
       sub: userId,
       email: email,
@@ -80,7 +80,7 @@ export class AuthService {
     });
   }
 
-  async login(loginDto: LoginDto): Promise<accessToken | refreshToken> {
+  async login(loginDto: LoginDto): Promise<AccessToken & RefreshToken> {
     const { email, password } = loginDto;
     const user = await this.userService.findByEmail(email);
 
@@ -93,7 +93,7 @@ export class AuthService {
       this.generateRefreshTokens(user.id, user.email),
     ]);
 
-    const tokens: accessToken | refreshToken = {
+    const tokens: AccessToken & RefreshToken = {
       ...accessTokenDetails,
       ...refreshTokenDetails,
     };

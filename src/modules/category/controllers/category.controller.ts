@@ -8,10 +8,12 @@ import {
   Patch,
   HttpStatus,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ResponseFormat } from 'src/utils';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dtos';
 import { CategoryService } from '../services';
+import { PaginationDto } from 'src/shared';
 
 @Controller('product-categories')
 export class CategoryController {
@@ -33,8 +35,12 @@ export class CategoryController {
   }
 
   @Get()
-  async getAllCategories(@Response() res) {
-    const categories = await this.categoryService.getAllCategories();
+  async getAllCategories(
+    @Query() paginationDto: PaginationDto,
+    @Response() res,
+  ) {
+    const categories =
+      await this.categoryService.getAllCategories(paginationDto);
     ResponseFormat.successResponse(
       res,
       categories,

@@ -1,13 +1,13 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
-import { ICategory, IProduct } from 'src/shared';
+import { ICategory, IProduct, IProductService } from 'src/shared';
 import AppError from 'src/utils/app-error.utils';
 import { CreateProductDto, UpdateProductDto } from '../dtos';
 import { InjectModel } from '@nestjs/mongoose';
 import { sanitizeInput } from 'src/utils/sanitize.utils';
 
 @Injectable()
-export class ProductService {
+export class ProductService implements IProductService {
   @InjectModel('products')
   private readonly productModel: Model<IProduct>;
   @InjectModel('categories')
