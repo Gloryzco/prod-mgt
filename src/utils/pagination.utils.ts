@@ -1,51 +1,67 @@
+import { HttpStatus } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { PaginationDto } from 'src/shared';
+import { IPaginatedResponse, PaginationDto } from 'src/shared';
+import { FilterOperators } from 'src/shared/enums';
+import AppError from 'src/utils/app-error.utils';
 
-export class PaginationUtil {
-  static async paginate(model: Model<any>, paginationDto: PaginationDto) {
-    const { page, limit, sortBy, sortOrder, filter } = paginationDto;
+export class PaginateAndFilter<T> {
+  private readonly paginationDto: PaginationDto;
+  private readonly model: Model<T>;
+  private readonly fields: string[];
+
+  constructor(
+    paginationDto: PaginationDto,
+    model: Model<T>,
+    fields: string[] = [],
+  ) {
+    this.paginationDto = paginationDto;
+    this.model = model;
+    this.fields = fields;
+  }
+
+  private buildFilters(): any {
+    const filters: any = {};
+
+    if (this.paginationDto.amount) {
+      const amount = parseFloat(this.paginationDto.amount);
+      const operator = this.paginationDto.operator || '$eq';
+
+      if (!Object.values(FilterOperators).includes(operator as FilterOperators)) {
+        throw new AppError(`Unsupported filter operator: ${operator}`, HttpStatus.BAD_REQUEST);
+      }
+
+      filters['$expr'] = {
+        [operator]: [{ $toDouble: '$amount' }, amount],
+      };
+    }
+
+    return filters;
+  }
+
+  async paginateAndFilter(): Promise<IPaginatedResponse<T>> {
+    const page = this.paginationDto?.page > 0 ? this.paginationDto.page : 1;
+    const limit = this.paginationDto?.limit ?? 10;
     const skip = (page - 1) * limit;
+    const filters = this.buildFilters();
 
-    const query = model.find();
+    const totalRecords = await this.model.countDocuments(filters).exec();
+    const query = this.model
+      .find(filters)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    if (filter) {
-      const { field, operator, value } = filter;
-
-      if (!field) {
-        throw new Error('Filter field is required');
-      }
-
-      switch (operator) {
-        case '$eq':
-          query.where(field).equals(value);
-          break;
-        case '$ne':
-          query.where(field).ne(value);
-          break;
-        case '$contains':
-          query.where(field).regex(new RegExp(`.*${value}.*`, 'i'));
-          break;
-        case '$startsWith':
-          query.where(field).regex(new RegExp(`^${value}`));
-          break;
-        case '$endsWith':
-          query.where(field).regex(new RegExp(`${value}$`));
-          break;
-        case '$gt':
-        case '$lt':
-        case '$gte':
-        case '$lte':
-          query.where(field)[operator](value);
-          break;
-        default:
-          throw new Error(`Unsupported filter operator: ${operator}`);
-      }
+    if (this.fields.length > 0) {
+      query.select(this.fields.join(' '));
     }
 
-    if (sortBy) {
-      query.sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 });
-    }
+    const data = await query.exec();
 
-    return query.skip(skip).limit(limit).exec();
+    return {
+      totalRecords,
+      currentPage: page,
+      totalPages: Math.ceil(totalRecords / limit),
+      data,
+    };
   }
 }

@@ -1,13 +1,15 @@
 import { CreateCategoryDto, UpdateCategoryDto } from 'src/modules/category';
 import { ICategory } from '../schema';
-import { PaginationDto } from 'src/shared/dtos';
+import { IPaginatedResponse, PaginationDto } from 'src/shared';
 
 export interface ICategoryService {
   createCategory(
     createCategoryDto: CreateCategoryDto,
   ): Promise<Partial<ICategory>>;
 
-  getAllCategories(paginationDto: PaginationDto): Promise<Partial<ICategory>[]>;
+  getAllCategories(
+    paginationDto: PaginationDto,
+  ): Promise<IPaginatedResponse<ICategory>>;
 
   getCategoriesByName(name: string): Promise<ICategory | null>;
 

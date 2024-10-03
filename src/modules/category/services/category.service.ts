@@ -1,14 +1,23 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ICategory, ICategoryService, PaginationDto } from 'src/shared';
+import {
+  ICategory,
+  ICategoryService,
+  IPaginatedResponse,
+  PaginationDto,
+} from 'src/shared';
 import { Model, Types } from 'mongoose';
 import AppError from 'src/utils/app-error.utils';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dtos';
-import { sanitizeInput } from 'src/utils/sanitize.utils';
 import { BaseRepository } from 'src/database';
+import { sanitizeInput } from 'src/utils/sanitize.utils';
+import { PaginateAndFilter } from 'src/utils';
 
 @Injectable()
-export class CategoryService extends BaseRepository<ICategory> implements ICategoryService{
+export class CategoryService
+  extends BaseRepository<ICategory>
+  implements ICategoryService
+{
   constructor(
     @InjectModel('categories')
     private readonly categoryModel: Model<ICategory>,
@@ -31,17 +40,16 @@ export class CategoryService extends BaseRepository<ICategory> implements ICateg
     return category.toPayload();
   }
 
-  async getAllCategories(paginationDto: PaginationDto): Promise<Partial<ICategory>[]> {
-    const page = paginationDto?.page ?? 1;
-    const limit = paginationDto?.limit ?? 10;
-  
-    const categories = await this.categoryModel
-      .find()
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .exec();
-  
-    return categories.map((category) => category.toPayload());
+  async getAllCategories(
+    paginationDto: PaginationDto,
+  ): Promise<IPaginatedResponse<ICategory>> {
+    const paginateAndFilter = new PaginateAndFilter<ICategory>(
+      paginationDto,
+      this.categoryModel,
+      ['name', 'description', 'createdAt'],
+    );
+
+    return paginateAndFilter.paginateAndFilter();
   }
 
   async getCategoriesByName(name: string): Promise<ICategory | null> {

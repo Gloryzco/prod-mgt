@@ -15,7 +15,7 @@ import { CreateCategoryDto, UpdateCategoryDto } from '../dtos';
 import { CategoryService } from '../services';
 import { PaginationDto } from 'src/shared';
 
-@Controller('product-categories')
+@Controller('categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
@@ -36,8 +36,8 @@ export class CategoryController {
 
   @Get()
   async getAllCategories(
-    @Query() paginationDto: PaginationDto,
     @Response() res,
+    @Query() paginationDto?: PaginationDto,
   ) {
     const categories =
       await this.categoryService.getAllCategories(paginationDto);

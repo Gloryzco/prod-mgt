@@ -1,10 +1,17 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
-import { ICategory, IProduct, IProductService } from 'src/shared';
+import {
+  ICategory,
+  IPaginatedResponse,
+  IProduct,
+  IProductService,
+  PaginationDto,
+} from 'src/shared';
 import AppError from 'src/utils/app-error.utils';
 import { CreateProductDto, UpdateProductDto } from '../dtos';
 import { InjectModel } from '@nestjs/mongoose';
 import { sanitizeInput } from 'src/utils/sanitize.utils';
+import { PaginateAndFilter } from 'src/utils';
 
 @Injectable()
 export class ProductService implements IProductService {
@@ -13,8 +20,15 @@ export class ProductService implements IProductService {
   @InjectModel('categories')
   private readonly categoryModel: Model<ICategory>;
 
-  async getAllProducts(): Promise<IProduct[]> {
-    return this.productModel.find().exec();
+  async getAllProducts(
+    paginationDto: PaginationDto,
+  ): Promise<IPaginatedResponse<IProduct>> {
+    const paginator = new PaginateAndFilter<IProduct>(
+      paginationDto,
+      this.productModel,
+      ['name', 'price', 'categoryId', 'description', 'createdAt'],
+    );
+    return paginator.paginateAndFilter();
   }
 
   async getProductById(id: string): Promise<IProduct | null> {

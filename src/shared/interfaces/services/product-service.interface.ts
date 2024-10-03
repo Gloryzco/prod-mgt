@@ -1,8 +1,10 @@
 import { CreateProductDto, UpdateProductDto } from "src/modules";
 import { IProduct } from "../schema";
+import { PaginationDto } from "src/shared/dtos";
+import { IPaginatedResponse } from "../app";
 
 export interface IProductService {
-    getAllProducts(): Promise<IProduct[]>;
+    getAllProducts(paginationDto: PaginationDto): Promise<IPaginatedResponse<IProduct>>;
   
     getProductById(id: string): Promise<IProduct | null>;
   

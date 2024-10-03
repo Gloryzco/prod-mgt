@@ -8,18 +8,23 @@ import {
   Body,
   Response,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { ResponseFormat } from 'src/utils';
 import { CreateProductDto, UpdateProductDto } from '../dtos';
 import { ProductService } from '../services';
+import { PaginationDto } from 'src/shared';
 
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  async getAllProducts(@Response() res): Promise<any> {
-    const products = await this.productService.getAllProducts();
+  async getAllProducts(
+    @Response() res,
+    @Query() paginationDto?: PaginationDto,
+  ) {
+    const products = await this.productService.getAllProducts(paginationDto);
     return ResponseFormat.successResponse(
       res,
       products,
