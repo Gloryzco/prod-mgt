@@ -10,11 +10,10 @@ import {
   HttpStatus,
   Query,
 } from '@nestjs/common';
-import { ResponseFormat } from 'src/utils';
 import { CreateProductDto, UpdateProductDto } from '../dtos';
 import { ProductService } from '../services';
 import { PaginationDto } from 'src/shared';
-
+import { ResponseFormat } from 'src/utils';
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}

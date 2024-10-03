@@ -5,9 +5,9 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { ResponseFormat } from './response-format';
 import AppError from './app-error.utils';
 import AppValidationError from './app-validation-error';
+import { ResponseFormat } from './response-format';
 
 export interface ErrorLogDetails {
   filePath: string;

@@ -10,10 +10,10 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
-import { ResponseFormat } from 'src/utils';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dtos';
 import { CategoryService } from '../services';
 import { PaginationDto } from 'src/shared';
+import { ResponseFormat } from 'src/utils';
 
 @Controller('categories')
 export class CategoryController {

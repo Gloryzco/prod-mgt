@@ -17,4 +17,4 @@ EXPOSE 3000
 
 # ENTRYPOINT ["./entrypoint.sh"]
 
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/src/main.js"]

@@ -9,13 +9,13 @@ services:
     ports:
       - '3000:3000'
     environment:
-      - PORT=3009
-      - DB_TYPE = postgres
-      - DB_HOST=database
-      - DB_PORT=5432
-      - DB_USER=${DB_USERNAME}
-      - DB_PASS=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
+      # - PORT=3009
+      # - DB_TYPE = postgres
+      # - DB_HOST=database
+      # - DB_PORT=5432
+      # - DB_USER=${DB_USERNAME}
+      # - DB_PASS=${DB_PASSWORD}
+      # - DB_NAME=${DB_NAME}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     volumes:
