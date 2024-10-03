@@ -9,25 +9,19 @@ import {
 import { Model, Types } from 'mongoose';
 import AppError from 'src/utils/app-error.utils';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dtos';
-import { BaseRepository } from 'src/database';
 import { sanitizeInput } from 'src/utils/sanitize.utils';
 import { PaginateAndFilter } from 'src/utils';
 import { RedisService } from 'src/modules/redis';
 import { LoggerService } from 'src/logger/logger.service';
 
 @Injectable()
-export class CategoryService
-  // extends BaseRepository<ICategory>
-  implements ICategoryService
-{
+export class CategoryService implements ICategoryService {
   constructor(
     @InjectModel('categories')
     private readonly categoryModel: Model<ICategory>,
     private readonly loggerService: LoggerService,
     private readonly redisService: RedisService,
-  ) {
-    // super(categoryModel);
-  }
+  ) {}
 
   async createCategory(
     createCategoryDto: CreateCategoryDto,
