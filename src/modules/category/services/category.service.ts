@@ -12,6 +12,8 @@ import { CreateCategoryDto, UpdateCategoryDto } from '../dtos';
 import { BaseRepository } from 'src/database';
 import { sanitizeInput } from 'src/utils/sanitize.utils';
 import { PaginateAndFilter } from 'src/utils';
+import { RedisService } from 'src/modules/redis';
+import { LoggerService } from 'src/logger/logger.service';
 
 @Injectable()
 export class CategoryService
@@ -21,6 +23,8 @@ export class CategoryService
   constructor(
     @InjectModel('categories')
     private readonly categoryModel: Model<ICategory>,
+    private readonly redisService: RedisService,
+    private readonly loggerService: LoggerService,
   ) {
     super(categoryModel);
   }
@@ -48,8 +52,18 @@ export class CategoryService
       this.categoryModel,
       ['name', 'description', 'createdAt'],
     );
+    const cacheKey: string = `categories:${paginationDto}`;
 
-    return paginateAndFilter.paginateAndFilter();
+    const resultFromCache: string = await this.redisService.get(cacheKey);
+    if (resultFromCache) {
+      return JSON.parse(resultFromCache);
+    }
+
+    const paginatedResult = paginateAndFilter.paginateAndFilter();
+
+    await this.redisService.set(cacheKey, JSON.stringify(paginatedResult));
+
+    return paginatedResult;
   }
 
   async getCategoriesByName(name: string): Promise<ICategory | null> {
@@ -62,13 +76,22 @@ export class CategoryService
     if (!Types.ObjectId.isValid(sanitizedId)) {
       throw new AppError('Invalid category ID', HttpStatus.BAD_REQUEST);
     }
+    const cacheKey: string = `categories:${id}`;
+    const resultFromCache: string = await this.redisService.get(cacheKey);
 
-    const category = await this.categoryModel.findById(sanitizedId).exec();
+    if (resultFromCache) {
+      return JSON.parse(resultFromCache);
+    }
+    const category = (
+      await this.categoryModel.findById(sanitizedId).exec()
+    ).toPayload();
+
     if (!category) {
       throw new AppError('Category not found', HttpStatus.NOT_FOUND);
     }
+    await this.redisService.set(cacheKey, JSON.stringify(category));
 
-    return category.toPayload();
+    return category;
   }
 
   async updateCategory(

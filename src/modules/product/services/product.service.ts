@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, LoggerService } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
 import {
   ICategory,
@@ -12,23 +12,38 @@ import { CreateProductDto, UpdateProductDto } from '../dtos';
 import { InjectModel } from '@nestjs/mongoose';
 import { sanitizeInput } from 'src/utils/sanitize.utils';
 import { PaginateAndFilter } from 'src/utils';
+import { RedisService } from 'src/modules/redis';
 
 @Injectable()
 export class ProductService implements IProductService {
-  @InjectModel('products')
-  private readonly productModel: Model<IProduct>;
-  @InjectModel('categories')
-  private readonly categoryModel: Model<ICategory>;
+  constructor(
+    @InjectModel('products')
+    private readonly productModel: Model<IProduct>,
+    @InjectModel('categories')
+    private readonly categoryModel: Model<ICategory>,
+    private readonly redisService: RedisService,
+    private readonly loggerService: LoggerService,
+  ) {}
 
   async getAllProducts(
     paginationDto: PaginationDto,
   ): Promise<IPaginatedResponse<IProduct>> {
-    const paginator = new PaginateAndFilter<IProduct>(
+    const paginateAndFilter = new PaginateAndFilter<IProduct>(
       paginationDto,
       this.productModel,
       ['name', 'price', 'categoryId', 'description', 'createdAt'],
     );
-    return paginator.paginateAndFilter();
+    const cacheKey: string = `products:${paginationDto}`;
+    const resultFromCache: string = await this.redisService.get(cacheKey);
+    if (resultFromCache) {
+      return JSON.parse(resultFromCache);
+    }
+
+    const paginatedResult = paginateAndFilter.paginateAndFilter();
+
+    await this.redisService.set(cacheKey, JSON.stringify(paginatedResult));
+
+    return paginatedResult;
   }
 
   async getProductById(id: string): Promise<IProduct | null> {
@@ -36,11 +51,17 @@ export class ProductService implements IProductService {
     if (!Types.ObjectId.isValid(sanitizedId)) {
       throw new AppError('Invalid product ID', HttpStatus.BAD_REQUEST);
     }
+    const cacheKey: string = `products:${id}`;
+    const resultFromCache: string = await this.redisService.get(cacheKey);
+    if (resultFromCache) {
+      return JSON.parse(resultFromCache);
+    }
 
     const product = await this.productModel.findById(sanitizedId).exec();
     if (!product) {
       throw new AppError('Product not found', HttpStatus.NOT_FOUND);
     }
+    await this.redisService.set(cacheKey, JSON.stringify(product));
     return product;
   }
 
