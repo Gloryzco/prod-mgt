@@ -14,6 +14,7 @@ const config = configuration();
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  //allows express-rate-limit to accurately identifying users for ip
   app.set('trust proxy', 1);
 
   app.setGlobalPrefix('api/v1');

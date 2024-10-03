@@ -20,6 +20,7 @@ export interface ErrorLogDetails {
   errorMessage: string;
 }
 
+//Handle all unexpected exceptions
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: Error, host: ArgumentsHost) {
