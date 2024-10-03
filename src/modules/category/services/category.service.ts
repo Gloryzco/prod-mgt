@@ -17,16 +17,16 @@ import { LoggerService } from 'src/logger/logger.service';
 
 @Injectable()
 export class CategoryService
-  extends BaseRepository<ICategory>
+  // extends BaseRepository<ICategory>
   implements ICategoryService
 {
   constructor(
     @InjectModel('categories')
     private readonly categoryModel: Model<ICategory>,
-    private readonly redisService: RedisService,
     private readonly loggerService: LoggerService,
+    private readonly redisService: RedisService,
   ) {
-    super(categoryModel);
+    // super(categoryModel);
   }
 
   async createCategory(

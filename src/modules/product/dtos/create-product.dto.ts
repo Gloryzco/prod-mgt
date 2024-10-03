@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional, IsNotEmpty } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsNotEmpty, IsBoolean } from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
@@ -16,6 +16,14 @@ export class CreateProductDto {
   @IsNumber()
   @IsOptional()
   readonly stockQuantity?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  readonly available?: boolean;
+
+  @IsString()
+  @IsNotEmpty({ message: 'stock keeping unit is required.' })
+  readonly sku: string;
 
   @IsString()
   @IsNotEmpty({ message: 'category id is required.' })

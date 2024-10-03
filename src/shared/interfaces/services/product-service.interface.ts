@@ -8,7 +8,7 @@ export interface IProductService {
   
     getProductById(id: string): Promise<IProduct | null>;
   
-    createProduct(createProductDto: CreateProductDto): Promise<IProduct>;
+    createProduct(createProductDto: CreateProductDto): Promise<Partial<IProduct>>
   
     updateProduct(id: string, updateProductDto: UpdateProductDto): Promise<IProduct | null>;
   

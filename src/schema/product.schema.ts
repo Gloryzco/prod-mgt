@@ -11,25 +11,31 @@ const productSchema: Schema<IProduct> = new Schema(
     price: { type: Number, required: true },
     stockQuantity: { type: Number, default: 0 },
     categoryId: { type: Schema.Types.ObjectId, index: true, ref: 'Category' },
+    available: {type: Boolean, default: true},
+    sku: { type: String, unique: true, required: true },
   },
   {
     collection: 'products',
-    timestamp: true,
+    timestamps: true,
   },
 );
 productSchema.index({ name: 1 });
 productSchema.index({ category: 1 });
 productSchema.index({ createdAt: -1 });
 
-// productSchema.pre('save', async function(next) {
-//   if (this.categoryId) {
-//     const categoryExists = await Category.exists(this.categoryId);
-//     if (!categoryExists) {
-//       throw new AppError('Category not found', HttpStatus.NOT_FOUND);
-//     }
-//   }
-//   next();
-// });
+productSchema.methods.toPayload = function (): Partial<IProduct> {
+  return {
+    id: this._id,
+    name: this.name,
+    sku: this.sku,
+    price: this.price,
+    stockQuantity: this.stockQuantity,
+    categoryId: this.categoryId,
+    available: this.available,
+    description: this.description,
+    createdAt: this.createdAt,
+  };
+};
 
 const Product = model('Product', productSchema);
 export { Product, productSchema };

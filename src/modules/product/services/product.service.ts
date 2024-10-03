@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, LoggerService } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
 import {
   ICategory,
@@ -13,6 +13,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { sanitizeInput } from 'src/utils/sanitize.utils';
 import { PaginateAndFilter } from 'src/utils';
 import { RedisService } from 'src/modules/redis';
+import { LoggerService } from 'src/logger';
 
 @Injectable()
 export class ProductService implements IProductService {
@@ -21,8 +22,8 @@ export class ProductService implements IProductService {
     private readonly productModel: Model<IProduct>,
     @InjectModel('categories')
     private readonly categoryModel: Model<ICategory>,
-    private readonly redisService: RedisService,
     private readonly loggerService: LoggerService,
+    private readonly redisService: RedisService,
   ) {}
 
   async getAllProducts(
@@ -65,7 +66,7 @@ export class ProductService implements IProductService {
     return product;
   }
 
-  async createProduct(createProductDto: CreateProductDto): Promise<IProduct> {
+  async createProduct(createProductDto: CreateProductDto): Promise<Partial<IProduct>> {
     const sanitizedProductDto = sanitizeInput(createProductDto);
 
     if (!Types.ObjectId.isValid(sanitizedProductDto.categoryId)) {
@@ -79,8 +80,8 @@ export class ProductService implements IProductService {
       throw new AppError('Category not found', HttpStatus.NOT_FOUND);
     }
 
-    const product = new this.productModel(sanitizedProductDto);
-    return product.save();
+    const product = await new this.productModel(sanitizedProductDto).save();
+    return product.toPayload();
   }
 
   async updateProduct(
