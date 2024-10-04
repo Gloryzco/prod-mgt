@@ -74,3 +74,80 @@ Once your `.env` variables is set and you have docker intalled on your local, ru
 ```bash
 docker-compose up --build
 ```
+
+## API Endpoints
+
+### Categories
+
+#### Create Category
+- **POST** `/categories`
+- **Description**: Create a new category.
+- **Request Body**: `CreateCategoryDto`
+
+#### Get All Categories
+- **GET** `/categories`
+- **Description**: Fetch all categories with optional pagination.
+- **Query Params**: `paginationDto`
+
+#### Get Category By ID
+- **GET** `/categories/:id`
+- **Description**: Fetch a specific category by ID.
+- **Path Params**: `id`
+
+#### Update Category
+- **PATCH** `/categories/:id`
+- **Description**: Update an existing category.
+- **Path Params**: `id`
+- **Request Body**: `UpdateCategoryDto`
+
+#### Delete Category
+- **DELETE** `/categories/:id`
+- **Description**: Delete a specific category by ID.
+- **Path Params**: `id`
+
+### Products
+
+#### Create Product
+- **POST** `/products`
+- **Description**: Create a new product.
+- **Request Body**: `CreateProductDto`
+
+#### Get All Products
+- **GET** `/products`
+- **Description**: Fetch all products with optional pagination.
+- **Query Params**: `paginationDto`
+
+#### Get Product By ID
+- **GET** `/products/:id`
+- **Description**: Fetch a specific product by ID.
+- **Path Params**: `id`
+
+#### Update Product
+- **PATCH** `/products/:id`
+- **Description**: Update an existing product.
+- **Path Params**: `id`
+- **Request Body**: `UpdateProductDto`
+
+#### Delete Product
+- **DELETE** `/products/:id`
+- **Description**: Delete a specific product by ID.
+- **Path Params**: `id`
+
+### User
+
+#### Register User
+- **POST** `/user/register`
+- **Description**: Create a new user.
+- **Request Body**: `CreateUserDto`
+
+### Authentication
+
+#### User Login
+- **POST** `/auth/login`
+- **Description**: Authenticate a user and return a JWT.
+- **Request Body**: `LoginDto`
+
+#### Refresh Token
+- **POST** `/auth/refresh-token`
+- **Description**: Refresh the access token using the refresh token.
+- **Request Body**: `RefreshTokenDto`
