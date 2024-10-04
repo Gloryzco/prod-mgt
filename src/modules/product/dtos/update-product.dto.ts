@@ -9,6 +9,10 @@ export class UpdateProductDto {
   @IsOptional()
   readonly description?: string;
 
+  @IsString()
+  @IsOptional()
+  readonly sku?: string;
+
   @IsNumber()
   @IsOptional()
   readonly price?: number;

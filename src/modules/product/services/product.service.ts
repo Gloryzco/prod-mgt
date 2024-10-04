@@ -96,7 +96,7 @@ export class ProductService implements IProductService {
     if (!Types.ObjectId.isValid(sanitizedId)) {
       throw new AppError('Invalid product ID', HttpStatus.BAD_REQUEST);
     }
-
+    
     if (
       sanitizedProductDto.categoryId &&
       !Types.ObjectId.isValid(sanitizedProductDto.categoryId)

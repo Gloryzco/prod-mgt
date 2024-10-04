@@ -70,22 +70,25 @@ export class CategoryService implements ICategoryService {
     if (!Types.ObjectId.isValid(sanitizedId)) {
       throw new AppError('Invalid category ID', HttpStatus.BAD_REQUEST);
     }
+
     const cacheKey: string = `categories:${id}`;
-    const resultFromCache: string = await this.redisService.get(cacheKey);
+    const resultFromCache: string | null =
+      await this.redisService.get(cacheKey);
 
     if (resultFromCache) {
       return JSON.parse(resultFromCache);
     }
-    const category = (
-      await this.categoryModel.findById(sanitizedId).exec()
-    ).toPayload();
+
+    const category = await this.categoryModel.findById(sanitizedId).exec();
 
     if (!category) {
       throw new AppError('Category not found', HttpStatus.NOT_FOUND);
     }
-    await this.redisService.set(cacheKey, JSON.stringify(category));
 
-    return category;
+    const categoryPayload = category.toPayload();
+    await this.redisService.set(cacheKey, JSON.stringify(categoryPayload));
+
+    return categoryPayload;
   }
 
   async updateCategory(

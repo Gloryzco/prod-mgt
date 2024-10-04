@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { RedisClientProvider } from '../repository';
 import { LoggerService } from 'src/logger';
 
-const tenMinutesInSeconds = 60 * 10;
+const fiveSeconds = 10;
 
 @Injectable()
 export class RedisService {
@@ -15,7 +15,7 @@ export class RedisService {
     key: string,
     value: any,
     keyType: string = 'store',
-    expiry: number = tenMinutesInSeconds,
+    expiry: number = fiveSeconds,
   ): Promise<void> {
     try {
       const redisKey = `${keyType}:${key}`;
