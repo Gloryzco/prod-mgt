@@ -12,7 +12,6 @@ import { CreateProductDto, UpdateProductDto } from '../dtos';
 import { InjectModel } from '@nestjs/mongoose';
 import { sanitizeInput } from 'src/shared/utils/sanitize.utils';
 import { PaginateAndFilter } from 'src/shared/utils';
-import { RedisService } from 'src/modules/redis';
 import { LoggerService } from 'src/logger';
 
 @Injectable()
@@ -23,7 +22,6 @@ export class ProductService implements IProductService {
     @InjectModel('categories')
     private readonly categoryModel: Model<ICategory>,
     private readonly loggerService: LoggerService,
-    private readonly redisService: RedisService,
   ) {}
 
   async getAllProducts(
@@ -34,15 +32,8 @@ export class ProductService implements IProductService {
       this.productModel,
       ['name', 'price', 'categoryId', 'description', 'createdAt'],
     );
-    const cacheKey: string = `products:${JSON.stringify(paginationDto)}`;
-    const resultFromCache: string = await this.redisService.get(cacheKey);
-    if (resultFromCache) {
-      return JSON.parse(resultFromCache);
-    }
 
     const paginatedResult = await paginateAndFilter.paginateAndFilter();
-
-    await this.redisService.set(cacheKey, JSON.stringify(paginatedResult));
 
     return paginatedResult;
   }
@@ -52,17 +43,11 @@ export class ProductService implements IProductService {
     if (!Types.ObjectId.isValid(sanitizedId)) {
       throw new AppError('Invalid product ID', HttpStatus.BAD_REQUEST);
     }
-    const cacheKey: string = `products:${id}`;
-    const resultFromCache: string = await this.redisService.get(cacheKey);
-    if (resultFromCache) {
-      return JSON.parse(resultFromCache);
-    }
-
+    
     const product = await this.productModel.findById(sanitizedId).exec();
     if (!product) {
       throw new AppError('Product not found', HttpStatus.NOT_FOUND);
     }
-    await this.redisService.set(cacheKey, JSON.stringify(product));
     return product;
   }
 
@@ -130,6 +115,8 @@ export class ProductService implements IProductService {
     if (!Types.ObjectId.isValid(sanitizedId)) {
       throw new AppError('Invalid product ID', HttpStatus.BAD_REQUEST);
     }
+
+    await this.getProductById(sanitizedId);
 
     await this.productModel.findByIdAndDelete(sanitizedId).exec();
   }

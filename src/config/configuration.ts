@@ -13,10 +13,6 @@ export default () => ({
     url: config.get<string>('API_URL'),
   },
 
-  redis: {
-    host: config.get<any>('REDIS_HOST'),
-    port: config.get<number>('REDIS_PORT'),
-  },
 
   mongodb: {
     url: config.get<string>('MONGODB_URL'),

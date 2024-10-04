@@ -11,7 +11,6 @@ import AppError from 'src/shared/utils/app-error.utils';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dtos';
 import { sanitizeInput } from 'src/shared/utils/sanitize.utils';
 import { PaginateAndFilter } from 'src/shared/utils';
-import { RedisService } from 'src/modules/redis';
 import { LoggerService } from 'src/logger/logger.service';
 
 @Injectable()
@@ -20,7 +19,6 @@ export class CategoryService implements ICategoryService {
     @InjectModel('categories')
     private readonly categoryModel: Model<ICategory>,
     private readonly loggerService: LoggerService,
-    private readonly redisService: RedisService,
   ) {}
 
   async createCategory(
@@ -46,16 +44,8 @@ export class CategoryService implements ICategoryService {
       this.categoryModel,
       ['name', 'description', 'createdAt'],
     );
-    const cacheKey: string = `categories:${JSON.stringify(paginationDto)}`;
-
-    const resultFromCache: string = await this.redisService.get(cacheKey);
-    if (resultFromCache) {
-      return JSON.parse(resultFromCache);
-    }
 
     const paginatedResult = await paginateAndFilter.paginateAndFilter();
-
-    await this.redisService.set(cacheKey, JSON.stringify(paginatedResult));
 
     return paginatedResult;
   }
@@ -72,12 +62,6 @@ export class CategoryService implements ICategoryService {
     }
 
     const cacheKey: string = `categories:${id}`;
-    const resultFromCache: string | null =
-      await this.redisService.get(cacheKey);
-
-    if (resultFromCache) {
-      return JSON.parse(resultFromCache);
-    }
 
     const category = await this.categoryModel.findById(sanitizedId).exec();
 
@@ -86,7 +70,6 @@ export class CategoryService implements ICategoryService {
     }
 
     const categoryPayload = category.toPayload();
-    await this.redisService.set(cacheKey, JSON.stringify(categoryPayload));
 
     return categoryPayload;
   }

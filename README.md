@@ -12,7 +12,6 @@ The Store API is a RESTful API built using Node.js and the NestJS framework. The
 
 The API was designed with the following key features:
 
-- **Efficient Data Caching**: To improve performance, Redis is used to cache product and category data, reducing the number of requests made to the database and speeding up data retrieval.
 - **Rate Limiting**: A rate limiter has been implemented to allow a maximum of 100 requests per second, which helps prevent brute-force attacks and abuse by clients making excessive requests
 - **Data Validation and Sanitization**: Input data is validated and sanitized using NestJS validation pipes and mongo-sanitize library, ensuring that only valid and safe data is processed and stored in the database.
 - **Data Storage**:MongoDB is used as the database to store product and category data, providing flexibility and scalability for managing store inventory.
@@ -44,8 +43,6 @@ APP_NAME=
 APP_PORT=
 APP_DEBUG=
 
-REDIS_HOST=
-REDIS_PORT=
 MONGODB_URL=
 
 accessTokenSecret =
