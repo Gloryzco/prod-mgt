@@ -12,5 +12,4 @@ export interface IAuthService {
 
   login(loginDto: LoginDto): Promise<AccessToken & RefreshToken>;
 
-  logout(userId: string): Promise<boolean>;
 }

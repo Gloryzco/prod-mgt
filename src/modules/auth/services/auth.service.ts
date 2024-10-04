@@ -105,18 +105,4 @@ export class AuthService implements IAuthService {
     await this.updateRefreshToken(user.id, refreshTokenDetails.refreshToken);
     return tokens;
   }
-
-  async logout(userId: string): Promise<boolean> {
-    const user = await this.userService.findById(userId);
-    if (!user || !user.refreshToken) {
-      throw new AppError(
-        'Access denied. Login required',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-
-    await this.userService.update(userId, { refreshToken: null });
-
-    return true;
-  }
 }

@@ -3,8 +3,16 @@ import { CategoryController } from './category.controller';
 import { CategoryService } from '../services/category.service';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dtos';
 import { PaginationDto } from 'src/shared';
-import { HttpStatus } from '@nestjs/common';
+import { CanActivate, ExecutionContext, HttpStatus } from '@nestjs/common';
 import { ResponseFormat } from 'src/shared/utils';
+import { APP_GUARD } from '@nestjs/core';
+import { AccessTokenGuard } from 'src/shared//guards';
+
+class MockAccessTokenGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    return true; // Always allow access for unit tests
+  }
+}
 
 describe('CategoryController', () => {
   let controller: CategoryController;
@@ -32,7 +40,10 @@ describe('CategoryController', () => {
           useValue: mockCategoryService,
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(AccessTokenGuard)
+      .useClass(MockAccessTokenGuard)
+      .compile();
 
     controller = module.get<CategoryController>(CategoryController);
     service = module.get<CategoryService>(CategoryService);
@@ -53,7 +64,9 @@ describe('CategoryController', () => {
 
       await controller.createCategory(mockResponse, createCategoryDto);
 
-      expect(service.createCategory).toHaveBeenCalledWith(createCategoryDto);
+      expect(mockCategoryService.createCategory).toHaveBeenCalledWith(
+        createCategoryDto,
+      );
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.CREATED);
       expect(mockResponse.json).toHaveBeenCalledWith({
         status: 'success',
@@ -73,7 +86,9 @@ describe('CategoryController', () => {
 
       await controller.getAllCategories(mockResponse, paginationDto);
 
-      expect(service.getAllCategories).toHaveBeenCalledWith(paginationDto);
+      expect(mockCategoryService.getAllCategories).toHaveBeenCalledWith(
+        paginationDto,
+      );
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(mockResponse.json).toHaveBeenCalledWith({
         status: 'success',
@@ -85,19 +100,17 @@ describe('CategoryController', () => {
 
   describe('getCategoryById', () => {
     it('should return a category by id', async () => {
+      const categoryId = '66feb59dfc313b7fe18ed0a5';
       const category = {
-        id: '66feb59dfc313b7fe18ed0a5',
+        id: categoryId,
         name: 'Test Category',
       };
       mockCategoryService.getCategoriesById.mockResolvedValue(category);
 
-      await controller.getCategoryById(
-        '66feb59dfc313b7fe18ed0a5',
-        mockResponse,
-      );
+      await controller.getCategoryById(categoryId, mockResponse);
 
-      expect(service.getCategoriesById).toHaveBeenCalledWith(
-        '66feb59dfc313b7fe18ed0a5',
+      expect(mockCategoryService.getCategoriesById).toHaveBeenCalledWith(
+        categoryId,
       );
       expect(mockResponse.json).toHaveBeenCalledWith({
         status: 'success',
@@ -109,21 +122,22 @@ describe('CategoryController', () => {
 
   describe('updateCategory', () => {
     it('should update a category', async () => {
+      const categoryId = '66feb59dfc313b7fe18ed0a5';
       const updateCategoryDto: UpdateCategoryDto = { name: 'Updated Category' };
       const updatedCategory = {
-        id: '66feb59dfc313b7fe18ed0a5',
+        id: categoryId,
         ...updateCategoryDto,
       };
       mockCategoryService.updateCategory.mockResolvedValue(updatedCategory);
 
       await controller.updateCategory(
-        '66feb59dfc313b7fe18ed0a5',
+        categoryId,
         updateCategoryDto,
         mockResponse,
       );
 
-      expect(service.updateCategory).toHaveBeenCalledWith(
-        '66feb59dfc313b7fe18ed0a5',
+      expect(mockCategoryService.updateCategory).toHaveBeenCalledWith(
+        categoryId,
         updateCategoryDto,
       );
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
@@ -137,12 +151,13 @@ describe('CategoryController', () => {
 
   describe('deleteCategory', () => {
     it('should delete a category', async () => {
+      const categoryId = '66feb59dfc313b7fe18ed0a5';
       mockCategoryService.deleteCategory.mockResolvedValue(undefined);
 
-      await controller.deleteCategory('66feb59dfc313b7fe18ed0a5', mockResponse);
+      await controller.deleteCategory(categoryId, mockResponse);
 
-      expect(service.deleteCategory).toHaveBeenCalledWith(
-        '66feb59dfc313b7fe18ed0a5',
+      expect(mockCategoryService.deleteCategory).toHaveBeenCalledWith(
+        categoryId,
       );
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(mockResponse.json).toHaveBeenCalledWith({
