@@ -82,12 +82,10 @@ docker-compose up --build
 #### Create Category
 - **POST** `/categories`
 - **Description**: Create a new category.
-- **Request Body**: `CreateCategoryDto`
 
 #### Get All Categories
 - **GET** `/categories`
-- **Description**: Fetch all categories with optional pagination.
-- **Query Params**: `paginationDto`
+- **Description**: Fetch all categories with optional filters.
 
 #### Get Category By ID
 - **GET** `/categories/:id`
@@ -98,7 +96,6 @@ docker-compose up --build
 - **PATCH** `/categories/:id`
 - **Description**: Update an existing category.
 - **Path Params**: `id`
-- **Request Body**: `UpdateCategoryDto`
 
 #### Delete Category
 - **DELETE** `/categories/:id`
@@ -110,12 +107,10 @@ docker-compose up --build
 #### Create Product
 - **POST** `/products`
 - **Description**: Create a new product.
-- **Request Body**: `CreateProductDto`
 
 #### Get All Products
 - **GET** `/products`
-- **Description**: Fetch all products with optional pagination.
-- **Query Params**: `paginationDto`
+- **Description**: Fetch all products with optional filters.
 
 #### Get Product By ID
 - **GET** `/products/:id`
@@ -126,7 +121,6 @@ docker-compose up --build
 - **PATCH** `/products/:id`
 - **Description**: Update an existing product.
 - **Path Params**: `id`
-- **Request Body**: `UpdateProductDto`
 
 #### Delete Product
 - **DELETE** `/products/:id`
@@ -145,9 +139,7 @@ docker-compose up --build
 #### User Login
 - **POST** `/auth/login`
 - **Description**: Authenticate a user and return a JWT.
-- **Request Body**: `LoginDto`
 
 #### Refresh Token
 - **POST** `/auth/refresh-token`
 - **Description**: Refresh the access token using the refresh token.
-- **Request Body**: `RefreshTokenDto`
