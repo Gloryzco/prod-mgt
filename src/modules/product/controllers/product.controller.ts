@@ -9,11 +9,14 @@ import {
   Response,
   HttpStatus,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from '../dtos';
 import { ProductService } from '../services';
-import { PaginationDto } from 'src/shared';
-import { ResponseFormat } from 'src/utils';
+import { AccessTokenGuard, PaginationDto } from 'src/shared';
+import { ResponseFormat } from 'src/shared/utils';
+
+@UseGuards(AccessTokenGuard)
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}

@@ -5,7 +5,7 @@ import { CreateUserDto } from '../dtos';
 import { Model } from 'mongoose';
 import { IUser } from 'src/shared';
 import * as argon from 'argon2';
-import AppError from 'src/utils/app-error.utils';
+import AppError from 'src/shared/utils/app-error.utils';
 import { HttpStatus } from '@nestjs/common';
 
 describe('UserService', () => {
@@ -51,7 +51,9 @@ describe('UserService', () => {
         new AppError('User with this email exists', HttpStatus.CONFLICT),
       );
 
-      expect(mockUserModel.findOne).toHaveBeenCalledWith({ email: createUserDto.email });
+      expect(mockUserModel.findOne).toHaveBeenCalledWith({
+        email: createUserDto.email,
+      });
     });
 
     it('should hash the password and create a new user', async () => {
@@ -63,7 +65,11 @@ describe('UserService', () => {
       const hashedPassword = 'hashed_password';
       jest.spyOn(argon, 'hash').mockResolvedValue(hashedPassword);
 
-      const createdUser = { email: createUserDto.email, password: hashedPassword, toPayload: jest.fn() };
+      const createdUser = {
+        email: createUserDto.email,
+        password: hashedPassword,
+        toPayload: jest.fn(),
+      };
       createdUser.toPayload.mockReturnValue({ email: createdUser.email });
 
       mockUserModel.findOne.mockResolvedValue(null);
@@ -71,7 +77,9 @@ describe('UserService', () => {
 
       const result = await userService.create(createUserDto);
 
-      expect(mockUserModel.findOne).toHaveBeenCalledWith({ email: createUserDto.email });
+      expect(mockUserModel.findOne).toHaveBeenCalledWith({
+        email: createUserDto.email,
+      });
       expect(argon.hash).toHaveBeenCalledWith(createUserDto.password);
       expect(mockUserModel.create).toHaveBeenCalledWith({
         email: createUserDto.email,
@@ -109,7 +117,11 @@ describe('UserService', () => {
   describe('findById', () => {
     it('should return a user by ID', async () => {
       const userId = '12345';
-      const user = { id: userId, email: 'test@test.com', password: 'hashed_password' };
+      const user = {
+        id: userId,
+        email: 'test@test.com',
+        password: 'hashed_password',
+      };
 
       mockUserModel.findById.mockResolvedValue(user);
 
@@ -135,13 +147,21 @@ describe('UserService', () => {
     it('should update a user by ID and return the updated user', async () => {
       const userId = '12345';
       const updateData = { email: 'updated@test.com' };
-      const updatedUser = { id: userId, email: updateData.email, password: 'hashed_password' };
+      const updatedUser = {
+        id: userId,
+        email: updateData.email,
+        password: 'hashed_password',
+      };
 
       mockUserModel.findByIdAndUpdate.mockResolvedValue(updatedUser);
 
       const result = await userService.update(userId, updateData);
 
-      expect(mockUserModel.findByIdAndUpdate).toHaveBeenCalledWith(userId, updateData, { new: true });
+      expect(mockUserModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        userId,
+        updateData,
+        { new: true },
+      );
       expect(result).toEqual(updatedUser);
     });
 
@@ -153,7 +173,11 @@ describe('UserService', () => {
 
       const result = await userService.update(userId, updateData);
 
-      expect(mockUserModel.findByIdAndUpdate).toHaveBeenCalledWith(userId, updateData, { new: true });
+      expect(mockUserModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        userId,
+        updateData,
+        { new: true },
+      );
       expect(result).toBeNull();
     });
   });

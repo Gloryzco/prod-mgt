@@ -9,12 +9,14 @@ import {
   HttpStatus,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dtos';
 import { CategoryService } from '../services';
-import { PaginationDto } from 'src/shared';
-import { ResponseFormat } from 'src/utils';
+import { AccessTokenGuard, PaginationDto } from 'src/shared';
+import { ResponseFormat } from 'src/shared/utils';
 
+@UseGuards(AccessTokenGuard)
 @Controller('categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}

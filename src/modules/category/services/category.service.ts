@@ -7,10 +7,10 @@ import {
   PaginationDto,
 } from 'src/shared';
 import { Model, Types } from 'mongoose';
-import AppError from 'src/utils/app-error.utils';
+import AppError from 'src/shared/utils/app-error.utils';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dtos';
-import { sanitizeInput } from 'src/utils/sanitize.utils';
-import { PaginateAndFilter } from 'src/utils';
+import { sanitizeInput } from 'src/shared/utils/sanitize.utils';
+import { PaginateAndFilter } from 'src/shared/utils';
 import { RedisService } from 'src/modules/redis';
 import { LoggerService } from 'src/logger/logger.service';
 
@@ -46,14 +46,14 @@ export class CategoryService implements ICategoryService {
       this.categoryModel,
       ['name', 'description', 'createdAt'],
     );
-    const cacheKey: string = `categories:${paginationDto}`;
+    const cacheKey: string = `categories:${JSON.stringify(paginationDto)}`;
 
     const resultFromCache: string = await this.redisService.get(cacheKey);
     if (resultFromCache) {
       return JSON.parse(resultFromCache);
     }
 
-    const paginatedResult = paginateAndFilter.paginateAndFilter();
+    const paginatedResult = await paginateAndFilter.paginateAndFilter();
 
     await this.redisService.set(cacheKey, JSON.stringify(paginatedResult));
 

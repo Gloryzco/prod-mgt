@@ -4,7 +4,7 @@ import { CreateProductDto, UpdateProductDto } from '../dtos';
 import { PaginationDto } from 'src/shared';
 import { HttpStatus } from '@nestjs/common';
 import { ProductController } from '../controllers';
-import { ResponseFormat } from 'src/utils';
+import { ResponseFormat } from 'src/shared/utils';
 
 describe('ProductController', () => {
   let productController: ProductController;

@@ -3,6 +3,8 @@ import {
   Catch,
   ArgumentsHost,
   HttpStatus,
+  NotFoundException,
+  MethodNotAllowedException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import AppError from './app-error.utils';
@@ -24,8 +26,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const status = this.getStatusCode(exception);
-    const message = exception.message || 'An unexpected error occurred.';
-
+    const message = this.getErrorMessage(exception);
+    console.log(exception);
     ResponseFormat.failureResponse(response, null, message, status);
   }
 
@@ -36,6 +38,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof AppValidationError) {
       return HttpStatus.BAD_REQUEST;
+    }
+
+    if (exception instanceof NotFoundException) {
+      return HttpStatus.NOT_FOUND;
+    }
+
+    if (exception instanceof MethodNotAllowedException) {
+      return HttpStatus.METHOD_NOT_ALLOWED;
     }
 
     if (
@@ -50,5 +60,17 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     }
 
     return HttpStatus.INTERNAL_SERVER_ERROR;
+  }
+
+  private getErrorMessage(exception: Error): string {
+    if (exception instanceof NotFoundException) {
+      return 'The requested resource was not found.';
+    }
+
+    if (exception instanceof MethodNotAllowedException) {
+      return 'The HTTP method is not allowed for the requested resource.';
+    }
+
+    return exception.message || 'An unexpected error occurred.';
   }
 }

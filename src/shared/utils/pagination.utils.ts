@@ -2,7 +2,7 @@ import { HttpStatus } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { IPaginatedResponse, PaginationDto } from 'src/shared';
 import { FilterOperators } from 'src/shared/enums';
-import AppError from 'src/utils/app-error.utils';
+import AppError from 'src/shared/utils/app-error.utils';
 
 export class PaginateAndFilter<T> {
   private readonly paginationDto: PaginationDto;
@@ -20,19 +20,41 @@ export class PaginateAndFilter<T> {
   }
 
   private buildFilters(): any {
+    const { price, operator } = this.paginationDto;
+    if (price && !operator) {
+      throw new AppError(
+        'Operator must be set for filtering with price',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (!price && operator) {
+      throw new AppError(
+        'Operator can be used when filtering with price',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const filters: any = {};
 
-    if (this.paginationDto.amount) {
-      const amount = parseFloat(this.paginationDto.amount);
-      const operator = this.paginationDto.operator || '$eq';
+    if (this.paginationDto.price) {
+      const price = parseFloat(this.paginationDto.price);
+      const operatorMap: Record<string, string> = {
+        '=': '$eq',
+        '>': '$gt',
+        '<': '$lt',
+        '>=': '$gte',
+        '<=': '$lte',
+      };
 
-      if (!Object.values(FilterOperators).includes(operator as FilterOperators)) {
-        throw new AppError(`Unsupported filter operator: ${operator}`, HttpStatus.BAD_REQUEST);
+      const operator = operatorMap[this.paginationDto.operator] || '$eq';
+
+      if (!operatorMap[this.paginationDto.operator]) {
+        throw new AppError(
+          `Unsupported filter operator: ${this.paginationDto.operator}`,
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
-      filters['$expr'] = {
-        [operator]: [{ $toDouble: '$amount' }, amount],
-      };
+      filters['price'] = { [operator]: price };
     }
 
     return filters;

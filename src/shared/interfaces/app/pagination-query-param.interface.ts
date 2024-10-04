@@ -1,7 +1,7 @@
 export interface IQueryParams {
   page?: number;
   limit?: number;
-  amount?: string;
+  price?: string;
   operator?: string;
 }
 

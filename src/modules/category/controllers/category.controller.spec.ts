@@ -4,7 +4,7 @@ import { CategoryService } from '../services/category.service';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dtos';
 import { PaginationDto } from 'src/shared';
 import { HttpStatus } from '@nestjs/common';
-import { ResponseFormat } from 'src/utils';
+import { ResponseFormat } from 'src/shared/utils';
 
 describe('CategoryController', () => {
   let controller: CategoryController;
@@ -96,7 +96,9 @@ describe('CategoryController', () => {
         mockResponse,
       );
 
-      expect(service.getCategoriesById).toHaveBeenCalledWith('66feb59dfc313b7fe18ed0a5');
+      expect(service.getCategoriesById).toHaveBeenCalledWith(
+        '66feb59dfc313b7fe18ed0a5',
+      );
       expect(mockResponse.json).toHaveBeenCalledWith({
         status: 'success',
         message: 'Category fetched successfully',
@@ -139,7 +141,9 @@ describe('CategoryController', () => {
 
       await controller.deleteCategory('66feb59dfc313b7fe18ed0a5', mockResponse);
 
-      expect(service.deleteCategory).toHaveBeenCalledWith('66feb59dfc313b7fe18ed0a5');
+      expect(service.deleteCategory).toHaveBeenCalledWith(
+        '66feb59dfc313b7fe18ed0a5',
+      );
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(mockResponse.json).toHaveBeenCalledWith({
         status: 'success',

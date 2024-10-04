@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { RedisClientProvider } from '../repository';
 import { LoggerService } from 'src/logger';
-import { IRedisService } from 'src/shared';
 
 const tenMinutesInSeconds = 60 * 10;
 
 @Injectable()
-export class RedisService implements IRedisService{
+export class RedisService {
   constructor(
     private readonly redisClient: RedisClientProvider,
     private readonly loggerService: LoggerService,
@@ -15,7 +14,7 @@ export class RedisService implements IRedisService{
   async set(
     key: string,
     value: any,
-    keyType: string = 'air',
+    keyType: string = 'store',
     expiry: number = tenMinutesInSeconds,
   ): Promise<void> {
     try {
@@ -30,10 +29,10 @@ export class RedisService implements IRedisService{
       );
     }
   }
-
+  
   async get(
     key: string,
-    keyType: string = 'air',
+    keyType: string = 'store',
     pagination?: { page: number; limit: number },
   ): Promise<any> {
     try {
@@ -49,7 +48,7 @@ export class RedisService implements IRedisService{
     }
   }
 
-  async delete(key: string, keyType: string = 'air'): Promise<void> {
+  async delete(key: string, keyType: string = 'store'): Promise<void> {
     try {
       const redisKey = `${keyType}:${key}`;
       await this.redisClient.getRedisInstance().del(redisKey);

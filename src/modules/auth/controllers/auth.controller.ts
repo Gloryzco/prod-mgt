@@ -1,9 +1,8 @@
 import { Controller, Body, Response, Post, UseGuards } from '@nestjs/common';
 import { LoginDto, RefreshTokenDto } from '../dtos';
 import { AuthService } from '../services';
-import { GetCurrentUserId } from 'src/shared';
-import { ResponseFormat } from 'src/utils';
-// import AccessTokenGuard from 'src/shared/guards/access-token.guard';
+import { AccessTokenGuard } from 'src/shared';
+import { ResponseFormat } from 'src/shared/utils';
 
 @Controller('auth')
 export class AuthController {
@@ -15,17 +14,7 @@ export class AuthController {
     ResponseFormat.successResponse(res, user_login, 'User logged in');
   }
 
-  // @UseGuards(AccessTokenGuard)
-  @Post('logout')
-  async logout(
-    @Response() res,
-    @GetCurrentUserId() userId: string,
-  ): Promise<any> {
-    const userLogout = await this.authService.logout(userId);
-    ResponseFormat.successResponse(res, userLogout, 'User logged out');
-  }
-
-  // @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Post('refresh-token')
   async refreshToken(
     @Response() res,

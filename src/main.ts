@@ -6,7 +6,7 @@ import * as compression from 'compression';
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import configuration from './config/configuration';
-import AppValidationError from './utils/app-validation-error';
+import AppValidationError from './shared/utils/app-validation-error';
 
 const config = configuration();
 

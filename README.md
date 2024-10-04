@@ -1,73 +1,76 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Store API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Documentation
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- **Postman**:
 
-## Description
+## Project Overview
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+The Store API is a RESTful API built using Node.js and the NestJS framework. The primary goal of this project is to create and manage products and categories within a store. The API allows users to perform CRUD operations on products and categories, ensuring easy management of inventory and data.
 
-## Installation
+## Methodology
 
-```bash
-$ npm install
-```
+The API was designed with the following key features:
 
-## Running the app
+- **Efficient Data Caching**: To improve performance, Redis is used to cache product and category data, reducing the number of requests made to the database and speeding up data retrieval.
+- **Rate Limiting**: A rate limiter has been implemented to allow a maximum of 100 requests per second, which helps prevent brute-force attacks and abuse by clients making excessive requests
+- **Data Validation and Sanitization**: Input data is validated and sanitized using NestJS validation pipes and mongo-sanitize library, ensuring that only valid and safe data is processed and stored in the database.
+- **Data Storage**:MongoDB is used as the database to store product and category data, providing flexibility and scalability for managing store inventory.
+- **JWT Authentication**: JSON Web Tokens (JWT) was used for user authentication, allowing secure access to the API endpoints.
+- **Unit Testing**: Comprehensive unit tests have been written for both the controllers and service classes to ensure the API functions as expected.
+- **Logging**: Winston is utilized as the logging library to capture and manage log data. Winston provides a flexible way to log different levels of messages (info, warn, error) and supports multiple transport layers, making it suitable for production-level applications.
+
+## Setup Guide
+
+### Local Setup
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/Gloryzco/prod-mgt.git
+   ```
+
+2. **Install dependencies:**
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+  npm install
 ```
 
-## Test
+3. **Configure environment variables:**
+   Create a .env file in the root directory and add the following configuration:
 
 ```bash
-# unit tests
-$ npm run test
+APP_NAME=
+APP_PORT=
+APP_DEBUG=
 
-# e2e tests
-$ npm run test:e2e
+REDIS_HOST=
+REDIS_PORT=
+MONGODB_URL=
 
-# test coverage
-$ npm run test:cov
+accessTokenSecret =
+refreshTokenSecret =
+accessTokenExpiration = '15m'
+refreshTokenExpiration = '7d'
+
 ```
 
-## Support
+4. **Start the application:**
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+npm run start
+```
 
-## Stay in touch
+6. **Running Tests:**
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+npm run test
+```
 
-## License
+### Using Docker
 
-Nest is [MIT licensed](LICENSE).
+Once your `.env` variables is set and you have docker intalled on your local, run the command
+
+```bash
+docker-compose up --build
+```

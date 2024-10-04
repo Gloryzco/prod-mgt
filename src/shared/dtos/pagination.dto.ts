@@ -17,7 +17,7 @@ export class PaginationDto {
   readonly limit?: number;
 
   @IsOptional()
-  readonly amount?: string;
+  readonly price?: string;
 
   @IsOptional()
   @IsIn(Object.keys(FilterOperators))

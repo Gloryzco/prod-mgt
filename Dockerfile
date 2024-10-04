@@ -1,20 +1,21 @@
-FROM node:18
+FROM node:20
 
 WORKDIR /app
 
-# Install necessary tools including the PostgreSQL client
-# RUN apt-get update && apt-get install -y netcat-openbsd postgresql-client
-
+# Copy package files and install dependencies
 COPY package*.json ./
+RUN npm install
 
+# Copy the rest of the application code
 COPY . .
 
-RUN npm install && npm run build
+# Build the TypeScript code
+RUN npm run build
 
-# COPY entrypoint.sh /app/
-
+# Expose port 3000
 EXPOSE 3000
 
-# ENTRYPOINT ["./entrypoint.sh"]
-
+# Start the application
 CMD ["node", "dist/src/main.js"]
+
+

@@ -2,16 +2,21 @@ import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto, RefreshTokenDto } from '../dtos';
 import * as argon from 'argon2';
-import { AccessToken, IAuthService, JwtPayload, RefreshToken } from 'src/shared';
+import {
+  AccessToken,
+  IAuthService,
+  JwtPayload,
+  RefreshToken,
+} from 'src/shared';
 import configuration from 'src/config/configuration';
 import { UserService } from 'src/modules';
-import AppError from 'src/utils/app-error.utils';
+import AppError from 'src/shared/utils/app-error.utils';
 import { User } from 'src/schema';
 
 const config = configuration();
 
 @Injectable()
-export class AuthService implements IAuthService{
+export class AuthService implements IAuthService {
   constructor(
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,

@@ -2,7 +2,7 @@ import { ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from 'src/modules';
-import AppError from 'src/utils/app-error.utils';
+import AppError from 'src/shared/utils/app-error.utils';
 
 @Injectable()
 export class AccessTokenGuard extends AuthGuard('jwt') {

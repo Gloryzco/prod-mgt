@@ -1,7 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 import { model, Schema } from 'mongoose';
 import { IProduct } from 'src/shared';
-import AppError from 'src/utils/app-error.utils';
+import AppError from 'src/shared/utils/app-error.utils';
 import { Category } from './category.schema';
 
 const productSchema: Schema<IProduct> = new Schema(
@@ -11,7 +11,7 @@ const productSchema: Schema<IProduct> = new Schema(
     price: { type: Number, required: true },
     stockQuantity: { type: Number, default: 0 },
     categoryId: { type: Schema.Types.ObjectId, index: true, ref: 'Category' },
-    available: {type: Boolean, default: true},
+    available: { type: Boolean, default: true },
     sku: { type: String, unique: true, required: true },
   },
   {

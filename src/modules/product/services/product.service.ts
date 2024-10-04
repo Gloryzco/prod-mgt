@@ -7,11 +7,11 @@ import {
   IProductService,
   PaginationDto,
 } from 'src/shared';
-import AppError from 'src/utils/app-error.utils';
+import AppError from 'src/shared/utils/app-error.utils';
 import { CreateProductDto, UpdateProductDto } from '../dtos';
 import { InjectModel } from '@nestjs/mongoose';
-import { sanitizeInput } from 'src/utils/sanitize.utils';
-import { PaginateAndFilter } from 'src/utils';
+import { sanitizeInput } from 'src/shared/utils/sanitize.utils';
+import { PaginateAndFilter } from 'src/shared/utils';
 import { RedisService } from 'src/modules/redis';
 import { LoggerService } from 'src/logger';
 
@@ -34,13 +34,13 @@ export class ProductService implements IProductService {
       this.productModel,
       ['name', 'price', 'categoryId', 'description', 'createdAt'],
     );
-    const cacheKey: string = `products:${paginationDto}`;
+    const cacheKey: string = `products:${JSON.stringify(paginationDto)}`;
     const resultFromCache: string = await this.redisService.get(cacheKey);
     if (resultFromCache) {
       return JSON.parse(resultFromCache);
     }
 
-    const paginatedResult = paginateAndFilter.paginateAndFilter();
+    const paginatedResult = await paginateAndFilter.paginateAndFilter();
 
     await this.redisService.set(cacheKey, JSON.stringify(paginatedResult));
 
@@ -66,7 +66,9 @@ export class ProductService implements IProductService {
     return product;
   }
 
-  async createProduct(createProductDto: CreateProductDto): Promise<Partial<IProduct>> {
+  async createProduct(
+    createProductDto: CreateProductDto,
+  ): Promise<Partial<IProduct>> {
     const sanitizedProductDto = sanitizeInput(createProductDto);
 
     if (!Types.ObjectId.isValid(sanitizedProductDto.categoryId)) {

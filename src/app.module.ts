@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -6,7 +6,7 @@ import configuration from './config/configuration';
 import { CategoryModule } from './modules';
 import { AuthModule, UserModule, RedisModule, ProductModule } from './modules';
 import { APP_FILTER } from '@nestjs/core';
-import { GlobalExceptionFilter } from './utils';
+import { GlobalExceptionFilter } from './shared/utils';
 
 const config = configuration();
 @Module({
@@ -24,4 +24,6 @@ const config = configuration();
     AppService,
   ],
 })
-export class AppModule {}
+export class AppModule { configure(consumer: MiddlewareConsumer) {
+ 
+}}
