@@ -7,11 +7,14 @@ import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import configuration from './config/configuration';
 import AppValidationError from './shared/utils/app-validation-error';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 const config = configuration();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.set('trust proxy', 1);
 
   app.setGlobalPrefix('api/v1');
 

@@ -27,7 +27,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const status = this.getStatusCode(exception);
     const message = this.getErrorMessage(exception);
-    console.log(exception);
     ResponseFormat.failureResponse(response, null, message, status);
   }
 
